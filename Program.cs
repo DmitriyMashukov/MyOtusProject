@@ -73,68 +73,85 @@ class Program
     }
     static void Main(string[] args)
     {
-        bool isContinue = true;
-        string name = "";
-
-        do
+        bool isContinue = true; 
+        while (isContinue) 
         {
-            if (name != "")
-                Console.WriteLine($"Приветствую, {name}! Чем могу помочь?" +
-                "\n /start \n /help \n /info \n /echo \n /addtask \n /showtasks \n /removetask \n /exit");
-            else
-                Console.WriteLine($"Приветствую, пользователь! Список доступных команд:" +
-                "\n /start \n /help \n /info \n /addtask \n /showtasks \n /removetask \n /exit");
-
-            var input = Console.ReadLine();
-            switch (input)
+            try
             {
-                case "/start":
-                    Console.WriteLine("Пожалуйста, введите ваше имя:");
-                    name = Console.ReadLine();
-                    Console.WriteLine($"Имя {name} успешно установлено.");
-                    ReturnMenu();
-                    break;
-                case "/help":
-                    DescriptionOfHelp();
-                    ReturnMenu();
-                    break;
-                case "/info":
-                    Console.WriteLine("Версия программы 1.0. Дата создания: 26.02.2025");
-                    ReturnMenu();
-                    break;
-                case "/echo":
-                    if (name == "")
+                string name = "";
+
+                do
+                {
+                    Console.Clear();
+                    if (name != "")
+                        Console.WriteLine($"Приветствую, {name}! Чем могу помочь?" +
+                        "\n/start \n/help \n/info \n/echo \n/addtask \n/showtasks \n/removetask \n/exit");
+                    else
+                        Console.WriteLine($"Приветствую, пользователь! Список доступных команд:" +
+                        "\n/start \n/help \n/info \n/addtask \n/showtasks \n/removetask \n/exit");
+
+                    var input = Console.ReadLine();
+                    switch (input)
                     {
-                        Console.WriteLine("Чтобы активировать эту команду введите своё имя.");
-                        ReturnMenu();
-                        break;
+                        case "/start":
+                            Console.WriteLine("Пожалуйста, введите ваше имя:");
+                            name = Console.ReadLine();
+                            Console.WriteLine($"Имя {name} успешно установлено.");
+                            ReturnMenu();
+                            break;
+                        case "/help":
+                            DescriptionOfHelp();
+                            ReturnMenu();
+                            break;
+                        case "/info":
+                            Console.WriteLine("Версия программы 1.0. Дата создания: 26.02.2025");
+                            ReturnMenu();
+                            break;
+                        case "/echo":
+                            if (name == "")
+                            {
+                                Console.WriteLine("Чтобы активировать эту команду введите своё имя.");
+                                ReturnMenu();
+                                break;
+                            }
+                            Console.WriteLine("Введите аргумент:");
+                            var arg = Console.ReadLine();
+                            Console.WriteLine(arg);
+                            ReturnMenu();
+                            break;
+                        case "/addtask":
+                            AddBook();
+                            ReturnMenu();
+                            break;
+                        case "/showtasks":
+                            ShowBooksList();
+                            ReturnMenu();
+                            break;
+                        case "/removetask":
+                            DeleteBook();
+                            ReturnMenu();
+                            break;
+                        case "/exit":
+                            Console.WriteLine("Завершение работы программы.");
+                            isContinue = false;
+                            break;
+                        default:
+                            Console.WriteLine("Введена некорректная команда.");
+                            ReturnMenu();
+                            break;
                     }
-                    Console.WriteLine("Введите аргумент:");
-                    var arg = Console.ReadLine();
-                    Console.WriteLine(arg);
-                    ReturnMenu();
-                    break;
-                case "/addtask":
-                    AddBook();
-                    ReturnMenu();
-                    break;
-                case "/showtasks":
-                    ShowBooksList();
-                    ReturnMenu();
-                    break;
-                case "/removetask":
-                    DeleteBook();
-                    ReturnMenu();
-                    break;
-                case "/exit":
-                    Console.WriteLine("Завершение работы программы.");
-                    isContinue = false;
-                    break;
-                default:
-                    Console.WriteLine("Введена некорректная команда.");
-                    ReturnMenu();
-                    break;
+                } while (isContinue);
+
             }
-        } while (isContinue);
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Произошла непредвиденная ошибка:\nType: {ex.GetType().Name}" +
+                    $"\nMessage: {ex.Message}\nStackTrace: {ex.StackTrace}\nInnerException: {ex.InnerException}");
+                Console.WriteLine("Нажмите Enter для продолжения");
+                Console.ReadLine();
+            }
+        }
+        
     }
+    
 }
