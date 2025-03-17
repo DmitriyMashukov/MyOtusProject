@@ -9,10 +9,19 @@ public class TaskCountLimitException : Exception
     {   
     }
 }
+
+public class TaskLengthLimitException : Exception
+{
+    public TaskLengthLimitException(int taskLength, int taskLengthLimit)
+        : base($"Длина задачи ‘{taskLength}’ превышает максимально допустимое значение {taskLengthLimit}")
+    {
+    }
+}
 class Program
 {
     static List<string> booksForRead = new List<string>();
     static int maxTaskCount;
+    static int maxTaskLength;
     public static void AddBook()
     {
         if (booksForRead.Count >= maxTaskCount)
@@ -20,6 +29,10 @@ class Program
 
         Console.WriteLine("Введите через запятую: название книги, имя и фамилию автора, количество страниц.");
         string book = Console.ReadLine();
+
+        if (book.Length > maxTaskLength)
+            throw new TaskLengthLimitException(book.Length, maxTaskLength);
+
         booksForRead.Add(book);
         Console.WriteLine($"Книга '{book}' добавлена в список.");
     }
@@ -95,6 +108,12 @@ class Program
                 if (maxTaskCount < 1 || maxTaskCount > 100)
                     throw new ArgumentException("Максимальное количество задач должно быть числом от 1 до 100.");
 
+                Console.WriteLine("Введите максимально допустимую длину задачи от 1 до 100.");
+                bool isLength = int.TryParse(Console.ReadLine(), out maxTaskLength);
+
+                if (maxTaskLength < 1 || maxTaskLength > 100)
+                    throw new ArgumentException("Максимальная длина задачи должна быть от 1 до 100.");
+
                 string name = "";
 
                 do
@@ -165,6 +184,10 @@ class Program
                 Console.WriteLine(ex.Message);
             }
             catch (TaskCountLimitException ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            catch (TaskLengthLimitException ex)
             {
                 Console.WriteLine(ex.Message);
             }
