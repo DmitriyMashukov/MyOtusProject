@@ -2,11 +2,22 @@
 
 namespace MyOtusProject;
 
+public class TaskCountLimitException : Exception
+{
+    public TaskCountLimitException(int taskCountLimit)
+        : base($"Превышено максимальное количество задач равное {taskCountLimit}")
+    {   
+    }
+}
 class Program
 {
     static List<string> booksForRead = new List<string>();
+    static int maxTaskCount;
     public static void AddBook()
     {
+        if (booksForRead.Count >= maxTaskCount)
+            throw new TaskCountLimitException(maxTaskCount);
+
         Console.WriteLine("Введите через запятую: название книги, имя и фамилию автора, количество страниц.");
         string book = Console.ReadLine();
         booksForRead.Add(book);
@@ -78,6 +89,12 @@ class Program
         {
             try
             {
+                Console.WriteLine("Введите максимально допустимое количество задач от 1 до 100");
+                bool isTask = int.TryParse(Console.ReadLine(), out maxTaskCount);
+
+                if (maxTaskCount < 1 || maxTaskCount > 100)
+                    throw new ArgumentException("Максимальное количество задач должно быть числом от 1 до 100.");
+
                 string name = "";
 
                 do
@@ -142,6 +159,14 @@ class Program
                     }
                 } while (isContinue);
 
+            }
+            catch (ArgumentException ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            catch (TaskCountLimitException ex)
+            {
+                Console.WriteLine(ex.Message);
             }
             catch (Exception ex)
             {
