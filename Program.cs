@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Numerics;
+using System.Text;
 
 namespace MyOtusProject;
 
@@ -30,6 +31,17 @@ class Program
     static List<string> booksForRead = new List<string>();
     static int maxTaskCount;
     static int maxTaskLength;
+
+    public static int ParseAndValidateInt(string? str, int min, int max)
+    {
+        if (!int.TryParse(str, out int number))
+            throw new ArgumentException("Не удалось преобразовать строку в число");
+
+        if (number < min || number > max)
+            throw new ArgumentException($"Число должно быть в диапазоне от {min} до {max}");
+
+        return number;
+    }
     public static void AddBook()
     {
         if (booksForRead.Count >= maxTaskCount)
@@ -114,14 +126,18 @@ class Program
             try
             {
                 Console.WriteLine("Введите максимально допустимое количество задач от 1 до 100");
-                bool isTask = int.TryParse(Console.ReadLine(), out maxTaskCount);
+                string? inputNumCount = Console.ReadLine();
+                maxTaskCount = ParseAndValidateInt(inputNumCount, 1, 100);
 
+                bool isTask = int.TryParse(Console.ReadLine(), out maxTaskCount);
                 if (maxTaskCount < 1 || maxTaskCount > 100)
                     throw new ArgumentException("Максимальное количество задач должно быть числом от 1 до 100.");
 
                 Console.WriteLine("Введите максимально допустимую длину задачи от 1 до 100.");
-                bool isLength = int.TryParse(Console.ReadLine(), out maxTaskLength);
+                string? inputNumLength = Console.ReadLine();
+                maxTaskCount = ParseAndValidateInt(inputNumLength, 1, 100);
 
+                bool isLength = int.TryParse(Console.ReadLine(), out maxTaskLength);
                 if (maxTaskLength < 1 || maxTaskLength > 100)
                     throw new ArgumentException("Максимальная длина задачи должна быть от 1 до 100.");
 
