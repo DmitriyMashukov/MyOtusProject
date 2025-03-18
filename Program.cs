@@ -13,7 +13,15 @@ public class TaskCountLimitException : Exception
 public class TaskLengthLimitException : Exception
 {
     public TaskLengthLimitException(int taskLength, int taskLengthLimit)
-        : base($"Длина задачи ‘{taskLength}’ превышает максимально допустимое значение {taskLengthLimit}")
+        : base($"Длина задачи {taskLength} превышает максимально допустимое значение {taskLengthLimit}")
+    {
+    }
+}
+
+public class DuplicateTaskException : Exception
+{
+    public DuplicateTaskException(string task)
+        : base($"Задача {task} уже существует")
     {
     }
 }
@@ -32,6 +40,9 @@ class Program
 
         if (book.Length > maxTaskLength)
             throw new TaskLengthLimitException(book.Length, maxTaskLength);
+
+        if (booksForRead.Contains(book))
+            throw new DuplicateTaskException(book);
 
         booksForRead.Add(book);
         Console.WriteLine($"Книга '{book}' добавлена в список.");
@@ -191,6 +202,10 @@ class Program
             {
                 Console.WriteLine(ex.Message);
             }
+            catch (DuplicateTaskException ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
             catch (Exception ex)
             {
                 Console.WriteLine($"Произошла непредвиденная ошибка:\nType: {ex.GetType().Name}" +
@@ -199,7 +214,5 @@ class Program
                 Console.ReadLine();
             }
         }
-        
-    }
-    
+    } 
 }
