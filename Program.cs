@@ -32,6 +32,11 @@ class Program
     static int maxTaskCount;
     static int maxTaskLength;
 
+    public static void ValidateString(string? str)
+    {
+        if (string.IsNullOrEmpty(str) || string.IsNullOrWhiteSpace(str))
+            throw new ArgumentException("Строка не может быть null, пустой строкой или быть пробелом");
+    }
     public static int ParseAndValidateInt(string? str, int min, int max)
     {
         if (!int.TryParse(str, out int number))
@@ -49,6 +54,7 @@ class Program
 
         Console.WriteLine("Введите через запятую: название книги, имя и фамилию автора, количество страниц.");
         string book = Console.ReadLine();
+        ValidateString(book);
 
         if (book.Length > maxTaskLength)
             throw new TaskLengthLimitException(book.Length, maxTaskLength);
