@@ -1,14 +1,67 @@
-﻿using System.Text;
+﻿using System.Numerics;
+using System.Text;
 
 namespace MyOtusProject;
 
+public class TaskCountLimitException : Exception
+{
+    public TaskCountLimitException(int taskCountLimit)
+        : base($"Превышено максимальное количество задач равное {taskCountLimit}")
+    {   
+    }
+}
+
+public class TaskLengthLimitException : Exception
+{
+    public TaskLengthLimitException(int taskLength, int taskLengthLimit)
+        : base($"Длина задачи {taskLength} превышает максимально допустимое значение {taskLengthLimit}")
+    {
+    }
+}
+
+public class DuplicateTaskException : Exception
+{
+    public DuplicateTaskException(string task)
+        : base($"Задача {task} уже существует")
+    {
+    }
+}
 class Program
 {
     static List<string> booksForRead = new List<string>();
+    static int maxTaskCount;
+    static int maxTaskLength;
+
+    public static void ValidateString(string? str)
+    {
+        if (string.IsNullOrEmpty(str) || string.IsNullOrWhiteSpace(str))
+            throw new ArgumentException("Строка не может быть null, пустой строкой или быть пробелом");
+    }
+    public static int ParseAndValidateInt(string? str, int min, int max)
+    {
+        if (!int.TryParse(str, out int number))
+            throw new ArgumentException("Не удалось преобразовать строку в число");
+
+        if (number < min || number > max)
+            throw new ArgumentException($"Число должно быть в диапазоне от {min} до {max}");
+
+        return number;
+    }
     public static void AddBook()
     {
+        if (booksForRead.Count >= maxTaskCount)
+            throw new TaskCountLimitException(maxTaskCount);
+
         Console.WriteLine("Введите через запятую: название книги, имя и фамилию автора, количество страниц.");
         string book = Console.ReadLine();
+        ValidateString(book);
+
+        if (book.Length > maxTaskLength)
+            throw new TaskLengthLimitException(book.Length, maxTaskLength);
+
+        if (booksForRead.Contains(book))
+            throw new DuplicateTaskException(book);
+
         booksForRead.Add(book);
         Console.WriteLine($"Книга '{book}' добавлена в список.");
     }
@@ -73,68 +126,115 @@ class Program
     }
     static void Main(string[] args)
     {
-        bool isContinue = true;
-        string name = "";
-
-        do
+        bool isContinue = true; 
+        while (isContinue) 
         {
-            if (name != "")
-                Console.WriteLine($"Приветствую, {name}! Чем могу помочь?" +
-                "\n /start \n /help \n /info \n /echo \n /addtask \n /showtasks \n /removetask \n /exit");
-            else
-                Console.WriteLine($"Приветствую, пользователь! Список доступных команд:" +
-                "\n /start \n /help \n /info \n /addtask \n /showtasks \n /removetask \n /exit");
-
-            var input = Console.ReadLine();
-            switch (input)
+            try
             {
-                case "/start":
-                    Console.WriteLine("Пожалуйста, введите ваше имя:");
-                    name = Console.ReadLine();
-                    Console.WriteLine($"Имя {name} успешно установлено.");
-                    ReturnMenu();
-                    break;
-                case "/help":
-                    DescriptionOfHelp();
-                    ReturnMenu();
-                    break;
-                case "/info":
-                    Console.WriteLine("Версия программы 1.0. Дата создания: 26.02.2025");
-                    ReturnMenu();
-                    break;
-                case "/echo":
-                    if (name == "")
+                Console.WriteLine("Введите максимально допустимое количество задач от 1 до 100");
+                string? inputNumCount = Console.ReadLine();
+                maxTaskCount = ParseAndValidateInt(inputNumCount, 1, 100);
+
+                bool isTask = int.TryParse(Console.ReadLine(), out maxTaskCount);
+                if (maxTaskCount < 1 || maxTaskCount > 100)
+                    throw new ArgumentException("Максимальное количество задач должно быть числом от 1 до 100.");
+
+                Console.WriteLine("Введите максимально допустимую длину задачи от 1 до 100.");
+                string? inputNumLength = Console.ReadLine();
+                maxTaskCount = ParseAndValidateInt(inputNumLength, 1, 100);
+
+                bool isLength = int.TryParse(Console.ReadLine(), out maxTaskLength);
+                if (maxTaskLength < 1 || maxTaskLength > 100)
+                    throw new ArgumentException("Максимальная длина задачи должна быть от 1 до 100.");
+
+                string name = "";
+
+                do
+                {
+                    Console.Clear();
+                    if (name != "")
+                        Console.WriteLine($"Приветствую, {name}! Чем могу помочь?" +
+                        "\n/start \n/help \n/info \n/echo \n/addtask \n/showtasks \n/removetask \n/exit");
+                    else
+                        Console.WriteLine($"Приветствую, пользователь! Список доступных команд:" +
+                        "\n/start \n/help \n/info \n/addtask \n/showtasks \n/removetask \n/exit");
+
+                    var input = Console.ReadLine();
+                    switch (input)
                     {
-                        Console.WriteLine("Чтобы активировать эту команду введите своё имя.");
-                        ReturnMenu();
-                        break;
+                        case "/start":
+                            Console.WriteLine("Пожалуйста, введите ваше имя:");
+                            name = Console.ReadLine();
+                            Console.WriteLine($"Имя {name} успешно установлено.");
+                            ReturnMenu();
+                            break;
+                        case "/help":
+                            DescriptionOfHelp();
+                            ReturnMenu();
+                            break;
+                        case "/info":
+                            Console.WriteLine("Версия программы 1.0. Дата создания: 26.02.2025");
+                            ReturnMenu();
+                            break;
+                        case "/echo":
+                            if (name == "")
+                            {
+                                Console.WriteLine("Чтобы активировать эту команду введите своё имя.");
+                                ReturnMenu();
+                                break;
+                            }
+                            Console.WriteLine("Введите аргумент:");
+                            var arg = Console.ReadLine();
+                            Console.WriteLine(arg);
+                            ReturnMenu();
+                            break;
+                        case "/addtask":
+                            AddBook();
+                            ReturnMenu();
+                            break;
+                        case "/showtasks":
+                            ShowBooksList();
+                            ReturnMenu();
+                            break;
+                        case "/removetask":
+                            DeleteBook();
+                            ReturnMenu();
+                            break;
+                        case "/exit":
+                            Console.WriteLine("Завершение работы программы.");
+                            isContinue = false;
+                            break;
+                        default:
+                            Console.WriteLine("Введена некорректная команда.");
+                            ReturnMenu();
+                            break;
                     }
-                    Console.WriteLine("Введите аргумент:");
-                    var arg = Console.ReadLine();
-                    Console.WriteLine(arg);
-                    ReturnMenu();
-                    break;
-                case "/addtask":
-                    AddBook();
-                    ReturnMenu();
-                    break;
-                case "/showtasks":
-                    ShowBooksList();
-                    ReturnMenu();
-                    break;
-                case "/removetask":
-                    DeleteBook();
-                    ReturnMenu();
-                    break;
-                case "/exit":
-                    Console.WriteLine("Завершение работы программы.");
-                    isContinue = false;
-                    break;
-                default:
-                    Console.WriteLine("Введена некорректная команда.");
-                    ReturnMenu();
-                    break;
+                } while (isContinue);
+
             }
-        } while (isContinue);
-    }
+            catch (ArgumentException ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            catch (TaskCountLimitException ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            catch (TaskLengthLimitException ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            catch (DuplicateTaskException ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Произошла непредвиденная ошибка:\nType: {ex.GetType().Name}" +
+                    $"\nMessage: {ex.Message}\nStackTrace: {ex.StackTrace}\nInnerException: {ex.InnerException}");
+                Console.WriteLine("Нажмите Enter для продолжения");
+                Console.ReadLine();
+            }
+        }
+    } 
 }
