@@ -3,29 +3,6 @@ using System.Text;
 
 namespace MyOtusProject;
 
-public class TaskCountLimitException : Exception
-{
-    public TaskCountLimitException(int taskCountLimit)
-        : base($"Превышено максимальное количество задач равное {taskCountLimit}")
-    {   
-    }
-}
-
-public class TaskLengthLimitException : Exception
-{
-    public TaskLengthLimitException(int taskLength, int taskLengthLimit)
-        : base($"Длина задачи {taskLength} превышает максимально допустимое значение {taskLengthLimit}")
-    {
-    }
-}
-
-public class DuplicateTaskException : Exception
-{
-    public DuplicateTaskException(string task)
-        : base($"Задача {task} уже существует")
-    {
-    }
-}
 class Program
 {
     static List<string> booksForRead = new List<string>();
@@ -53,17 +30,17 @@ class Program
             throw new TaskCountLimitException(maxTaskCount);
 
         Console.WriteLine("Введите через запятую: название книги, имя и фамилию автора, количество страниц.");
-        string book = Console.ReadLine();
-        ValidateString(book);
+        string task = Console.ReadLine();
+        ValidateString(task);
 
-        if (book.Length > maxTaskLength)
-            throw new TaskLengthLimitException(book.Length, maxTaskLength);
+        if (task.Length > maxTaskLength)
+            throw new TaskLengthLimitException(task.Length, maxTaskLength);
 
-        if (booksForRead.Contains(book))
-            throw new DuplicateTaskException(book);
+        if (booksForRead.Contains(task))
+            throw new DuplicateTaskException(task);
 
-        booksForRead.Add(book);
-        Console.WriteLine($"Книга '{book}' добавлена в список.");
+        booksForRead.Add(task);
+        Console.WriteLine($"Книга '{task}' добавлена в список.");
     }
 
     public static void ShowBooksList()
@@ -135,17 +112,9 @@ class Program
                 string? inputNumCount = Console.ReadLine();
                 maxTaskCount = ParseAndValidateInt(inputNumCount, 1, 100);
 
-                bool isTask = int.TryParse(Console.ReadLine(), out maxTaskCount);
-                if (maxTaskCount < 1 || maxTaskCount > 100)
-                    throw new ArgumentException("Максимальное количество задач должно быть числом от 1 до 100.");
-
                 Console.WriteLine("Введите максимально допустимую длину задачи от 1 до 100.");
                 string? inputNumLength = Console.ReadLine();
-                maxTaskCount = ParseAndValidateInt(inputNumLength, 1, 100);
-
-                bool isLength = int.TryParse(Console.ReadLine(), out maxTaskLength);
-                if (maxTaskLength < 1 || maxTaskLength > 100)
-                    throw new ArgumentException("Максимальная длина задачи должна быть от 1 до 100.");
+                maxTaskLength = ParseAndValidateInt(inputNumLength, 1, 100);
 
                 string name = "";
 
